@@ -1,359 +1,202 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NosaBot — Decentralized AI Assistant</title>
-  <style>
-    /* ------------------------------------------------------------------ */
-    /* Reset & variables                                                    */
-    /* ------------------------------------------------------------------ */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>NosaBot — Nosana Agent Builder</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0c0c18;--surf:#13132a;--card:#1a1a36;--inp:#1e1e3c;
+  --t1:#e8e8f8;--t2:#8888aa;
+  --acc:#7c3aed;--ach:#6d28d9;--acl:#a78bfa;
+  --grn:#00c896;--grl:#34d399;
+  --bdr:#25254a;--bu:#2d1b69;--ba:#1a1a36;--r:12px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--t1);height:100dvh;display:flex;flex-direction:column;overflow:hidden}
 
-    :root {
-      --bg-base:    #0c0c18;
-      --bg-surface: #13132a;
-      --bg-card:    #1a1a36;
-      --bg-input:   #1e1e3c;
-      --text-1:     #e8e8f8;
-      --text-2:     #8888aa;
-      --accent:     #7c3aed;
-      --accent-h:   #6d28d9;
-      --accent-l:   #a78bfa;
-      --green:      #00c896;
-      --green-l:    #34d399;
-      --border:     #25254a;
-      --bubble-u:   #2d1b69;
-      --bubble-a:   #1a1a36;
-      --radius:     12px;
-    }
+/* header */
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;background:var(--surf);border-bottom:1px solid var(--bdr);flex-shrink:0}
+.hl{display:flex;align-items:center;gap:10px}
+.av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--acc),var(--grn));display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:#fff;flex-shrink:0}
+.an{font-size:15px;font-weight:600}
+.sr{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t2);margin-top:1px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--t2);transition:background .3s}
+.dot.on{background:var(--grn);box-shadow:0 0 5px var(--grn)}
+.badge{display:flex;align-items:center;gap:5px;background:rgba(0,200,150,.08);border:1px solid rgba(0,200,150,.25);border-radius:20px;padding:5px 12px;font-size:11px;color:var(--grl)}
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: var(--bg-base);
-      color: var(--text-1);
-      height: 100dvh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
+/* layout */
+.layout{display:flex;flex:1;overflow:hidden}
 
-    /* ------------------------------------------------------------------ */
-    /* Header                                                               */
-    /* ------------------------------------------------------------------ */
-    .hdr {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 18px;
-      background: var(--bg-surface);
-      border-bottom: 1px solid var(--border);
-      flex-shrink: 0;
-    }
+/* sidebar */
+.sb{width:230px;background:var(--surf);border-right:1px solid var(--bdr);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+@media(max-width:700px){.sb{display:none}}
+.sbs{padding:13px;border-bottom:1px solid var(--bdr)}
+.sbt{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--t2);margin-bottom:8px}
+.qa{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:8px;cursor:pointer;font-size:12.5px;color:var(--t2);transition:all .15s;margin-bottom:1px}
+.qa:hover{background:var(--card);color:var(--t1)}
+.qi{font-size:15px;width:18px;text-align:center}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.stat{background:var(--card);border-radius:8px;padding:9px;text-align:center}
+.sv{font-size:20px;font-weight:700;color:var(--acl)}
+.sl{font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.05em}
+/* network widget */
+.netw{padding:12px;border-bottom:1px solid var(--bdr)}
+.net-row{display:flex;justify-content:space-between;align-items:center;font-size:11px;padding:3px 0}
+.net-k{color:var(--t2)}
+.net-v{color:var(--grl);font-weight:600}
+.net-loading{font-size:11px;color:var(--t2);text-align:center;padding:8px 0}
+.meta{padding:13px;margin-top:auto;border-top:1px solid var(--bdr)}
+.mr{font-size:11px;color:var(--t2);margin-bottom:4px}
+.mr b{color:var(--acl)}
+.mr .g{color:var(--grl)}
 
-    .hdr-left { display: flex; align-items: center; gap: 10px; }
+/* chat */
+.chat{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.err{background:rgba(239,68,68,.1);border-bottom:1px solid rgba(239,68,68,.3);color:#fca5a5;padding:9px 16px;font-size:13px;text-align:center;display:none}
+.err.show{display:block}
+.msgs{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth}
+.msgs::-webkit-scrollbar{width:4px}
+.msgs::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
 
-    .avatar {
-      width: 38px; height: 38px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--green));
-      display: flex; align-items: center; justify-content: center;
-      font-size: 17px; font-weight: 700; color: #fff;
-      flex-shrink: 0;
-    }
+/* welcome */
+.welcome{text-align:center;padding:32px 20px;color:var(--t2);animation:fi .3s ease}
+.wi{font-size:48px;margin-bottom:12px}
+.welcome h2{font-size:19px;color:var(--t1);margin-bottom:7px}
+.welcome p{font-size:13px;line-height:1.65;max-width:400px;margin:0 auto 18px}
+.chips{display:flex;flex-wrap:wrap;gap:7px;justify-content:center}
+.chip{background:var(--card);border:1px solid var(--bdr);border-radius:20px;padding:6px 13px;font-size:12px;cursor:pointer;transition:all .15s;color:var(--t1)}
+.chip:hover{background:var(--acc);border-color:var(--acc)}
 
-    .agent-name { font-size: 15px; font-weight: 600; }
+/* messages */
+.msg{display:flex;gap:9px;max-width:84%;animation:fi .2s ease}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{align-self:flex-end;flex-direction:row-reverse}
+.msg.agent{align-self:flex-start}
+.mav{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;align-self:flex-start}
+.msg.agent .mav{background:linear-gradient(135deg,var(--acc),var(--grn));color:#fff;font-weight:700}
+.msg.user .mav{background:var(--card);border:1px solid var(--bdr)}
+.mb{background:var(--ba);border:1px solid var(--bdr);border-radius:var(--r);padding:9px 13px;font-size:13.5px;line-height:1.65}
+.msg.user .mb{background:var(--bu);border-color:rgba(124,58,237,.35)}
+.mb p{margin-bottom:7px}.mb p:last-child{margin-bottom:0}
+.mb strong{color:var(--acl)}
+.mb em{color:var(--t2)}
+.mb del{opacity:.5}
+.mb ul,.mb ol{padding-left:18px;margin:4px 0}
+.mb li{margin-bottom:2px}
+.mb table{border-collapse:collapse;font-size:12px;margin:8px 0;width:100%}
+.mb th,.mb td{border:1px solid var(--bdr);padding:4px 8px;text-align:left}
+.mb th{background:var(--card);color:var(--acl)}
+/* code blocks */
+.cb-wrap{position:relative;margin:8px 0;border-radius:8px;overflow:hidden;background:rgba(0,0,0,.45);border:1px solid var(--bdr)}
+.cb-head{display:flex;justify-content:space-between;align-items:center;padding:5px 10px;background:rgba(255,255,255,.04);border-bottom:1px solid var(--bdr);font-size:11px;color:var(--t2)}
+.cb-actions{display:flex;gap:6px}
+.cb-btn{background:none;border:1px solid var(--bdr);color:var(--t2);border-radius:5px;padding:2px 8px;font-size:11px;cursor:pointer;transition:all .15s}
+.cb-btn:hover{background:var(--acc);border-color:var(--acc);color:#fff}
+.cb-wrap pre{margin:0;padding:12px;overflow-x:auto;font-family:"JetBrains Mono","Fira Code","Courier New",monospace;font-size:12px;line-height:1.6;color:#c9d1d9}
+.cb-wrap pre .key{color:#79c0ff}
+.cb-wrap pre .str{color:#a5d6ff}
+.cb-wrap pre .num{color:#f2cc60}
+.cb-wrap pre .bool{color:#ff7b72}
+.cb-wrap pre .punc{color:var(--t2)}
+.copied{color:var(--grn)!important;border-color:var(--grn)!important}
 
-    .status-row {
-      display: flex; align-items: center; gap: 5px;
-      font-size: 11px; color: var(--text-2); margin-top: 1px;
-    }
+/* typing */
+.tw{display:flex;align-items:center;gap:4px;padding:8px 2px}
+.td{width:7px;height:7px;background:var(--t2);border-radius:50%;animation:tb 1.2s infinite}
+.td:nth-child(2){animation-delay:.2s}.td:nth-child(3){animation-delay:.4s}
+@keyframes tb{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-7px)}}
 
-    .dot {
-      width: 7px; height: 7px; border-radius: 50%;
-      background: var(--text-2); transition: background .3s;
-    }
-    .dot.on { background: var(--green); box-shadow: 0 0 5px var(--green); }
-
-    .nosana-badge {
-      display: flex; align-items: center; gap: 5px;
-      background: rgba(0,200,150,.08);
-      border: 1px solid rgba(0,200,150,.25);
-      border-radius: 20px; padding: 5px 12px;
-      font-size: 11px; color: var(--green-l);
-    }
-
-    /* ------------------------------------------------------------------ */
-    /* Layout                                                               */
-    /* ------------------------------------------------------------------ */
-    .layout { display: flex; flex: 1; overflow: hidden; }
-
-    /* ------------------------------------------------------------------ */
-    /* Sidebar                                                              */
-    /* ------------------------------------------------------------------ */
-    .sidebar {
-      width: 220px;
-      background: var(--bg-surface);
-      border-right: 1px solid var(--border);
-      display: flex; flex-direction: column;
-      overflow: hidden; flex-shrink: 0;
-    }
-    @media (max-width: 680px) { .sidebar { display: none; } }
-
-    .sb-section { padding: 14px; border-bottom: 1px solid var(--border); }
-
-    .sb-title {
-      font-size: 10px; font-weight: 600;
-      text-transform: uppercase; letter-spacing: .08em;
-      color: var(--text-2); margin-bottom: 8px;
-    }
-
-    .qa {
-      display: flex; align-items: center; gap: 8px;
-      padding: 7px 9px; border-radius: 8px;
-      cursor: pointer; font-size: 13px; color: var(--text-2);
-      transition: all .15s; margin-bottom: 1px;
-    }
-    .qa:hover { background: var(--bg-card); color: var(--text-1); }
-    .qa .ic { font-size: 15px; width: 18px; text-align: center; }
-
-    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
-
-    .stat {
-      background: var(--bg-card); border-radius: 8px;
-      padding: 9px; text-align: center;
-    }
-    .stat-v { font-size: 20px; font-weight: 700; color: var(--accent-l); }
-    .stat-l { font-size: 10px; color: var(--text-2); text-transform: uppercase; letter-spacing: .05em; }
-
-    .meta { padding: 14px; margin-top: auto; border-top: 1px solid var(--border); }
-    .meta-row { font-size: 11px; color: var(--text-2); margin-bottom: 4px; }
-    .meta-row b { color: var(--accent-l); }
-    .meta-row .green { color: var(--green-l); }
-
-    /* ------------------------------------------------------------------ */
-    /* Chat area                                                            */
-    /* ------------------------------------------------------------------ */
-    .chat { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-
-    .err-banner {
-      background: rgba(239,68,68,.1); border-bottom: 1px solid rgba(239,68,68,.3);
-      color: #fca5a5; padding: 9px 16px; font-size: 13px; text-align: center;
-      display: none;
-    }
-    .err-banner.show { display: block; }
-
-    /* messages list */
-    .msgs {
-      flex: 1; overflow-y: auto; padding: 18px;
-      display: flex; flex-direction: column; gap: 14px;
-      scroll-behavior: smooth;
-    }
-    .msgs::-webkit-scrollbar { width: 4px; }
-    .msgs::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-    /* welcome screen */
-    .welcome {
-      text-align: center; padding: 36px 20px; color: var(--text-2);
-      animation: fadeIn .3s ease;
-    }
-    .welcome-icon { font-size: 52px; margin-bottom: 14px; }
-    .welcome h2 { font-size: 20px; color: var(--text-1); margin-bottom: 8px; }
-    .welcome p { font-size: 13px; line-height: 1.65; max-width: 380px; margin: 0 auto 20px; }
-
-    .chips { display: flex; flex-wrap: wrap; gap: 7px; justify-content: center; }
-    .chip {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 20px; padding: 6px 13px; font-size: 12px;
-      cursor: pointer; transition: all .15s; color: var(--text-1);
-    }
-    .chip:hover { background: var(--accent); border-color: var(--accent); }
-
-    /* individual message */
-    .msg {
-      display: flex; gap: 9px; max-width: 82%;
-      animation: fadeIn .2s ease;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(7px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .msg.user  { align-self: flex-end; flex-direction: row-reverse; }
-    .msg.agent { align-self: flex-start; }
-
-    .msg-av {
-      width: 30px; height: 30px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 13px; flex-shrink: 0; align-self: flex-start;
-    }
-    .msg.agent .msg-av {
-      background: linear-gradient(135deg, var(--accent), var(--green));
-      color: #fff; font-weight: 700;
-    }
-    .msg.user .msg-av { background: var(--bg-card); border: 1px solid var(--border); }
-
-    .msg-body {
-      background: var(--bubble-a); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 9px 13px;
-      font-size: 13.5px; line-height: 1.65;
-    }
-    .msg.user .msg-body { background: var(--bubble-u); border-color: rgba(124,58,237,.35); }
-
-    /* markdown basics */
-    .msg-body p      { margin-bottom: 7px; }
-    .msg-body p:last-child { margin-bottom: 0; }
-    .msg-body strong { color: var(--accent-l); }
-    .msg-body em     { color: var(--text-2); }
-    .msg-body del    { opacity: .5; }
-    .msg-body code   {
-      background: rgba(0,0,0,.35); padding: 2px 5px;
-      border-radius: 4px; font-family: monospace; font-size: 12px;
-    }
-    .msg-body pre {
-      background: rgba(0,0,0,.35); padding: 10px; border-radius: 8px;
-      overflow-x: auto; margin: 6px 0; font-size: 12px;
-    }
-    .msg-body ul, .msg-body ol { padding-left: 18px; margin: 4px 0; }
-    .msg-body li { margin-bottom: 2px; }
-    .msg-body table { border-collapse: collapse; font-size: 12px; margin: 8px 0; width: 100%; }
-    .msg-body th, .msg-body td { border: 1px solid var(--border); padding: 4px 8px; text-align: left; }
-    .msg-body th { background: var(--bg-card); color: var(--accent-l); }
-
-    /* typing indicator */
-    .typing-wrap { display: flex; align-items: center; gap: 4px; padding: 8px 2px; }
-    .t-dot { width: 7px; height: 7px; background: var(--text-2); border-radius: 50%; animation: tbounce 1.2s infinite; }
-    .t-dot:nth-child(2) { animation-delay: .2s; }
-    .t-dot:nth-child(3) { animation-delay: .4s; }
-    @keyframes tbounce {
-      0%,60%,100% { transform: translateY(0); }
-      30%          { transform: translateY(-7px); }
-    }
-
-    /* ------------------------------------------------------------------ */
-    /* Input area                                                           */
-    /* ------------------------------------------------------------------ */
-    .input-area {
-      padding: 14px 18px;
-      background: var(--bg-surface);
-      border-top: 1px solid var(--border);
-    }
-
-    .input-wrap {
-      display: flex; align-items: flex-end; gap: 9px;
-      background: var(--bg-input); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 9px 13px;
-      transition: border-color .15s;
-    }
-    .input-wrap:focus-within { border-color: var(--accent); }
-
-    #txt {
-      flex: 1; background: none; border: none; outline: none;
-      color: var(--text-1); font-size: 14px;
-      resize: none; max-height: 110px; min-height: 22px;
-      line-height: 1.5; font-family: inherit;
-    }
-    #txt::placeholder { color: var(--text-2); }
-
-    .send-btn {
-      background: var(--accent); border: none; border-radius: 8px;
-      width: 34px; height: 34px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; transition: all .15s; flex-shrink: 0;
-    }
-    .send-btn:hover  { background: var(--accent-h); }
-    .send-btn:disabled { background: var(--bg-card); cursor: not-allowed; }
-    .send-btn svg { width: 15px; height: 15px; fill: #fff; }
-
-    .hint { font-size: 11px; color: var(--text-2); text-align: center; margin-top: 7px; }
-  </style>
+/* input */
+.ia{padding:13px 18px;background:var(--surf);border-top:1px solid var(--bdr)}
+.iw{display:flex;align-items:flex-end;gap:9px;background:var(--inp);border:1px solid var(--bdr);border-radius:var(--r);padding:9px 13px;transition:border-color .15s}
+.iw:focus-within{border-color:var(--acc)}
+#txt{flex:1;background:none;border:none;outline:none;color:var(--t1);font-size:14px;resize:none;max-height:110px;min-height:22px;line-height:1.5;font-family:inherit}
+#txt::placeholder{color:var(--t2)}
+.sbtn{background:var(--acc);border:none;border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;flex-shrink:0}
+.sbtn:hover{background:var(--ach)}.sbtn:disabled{background:var(--card);cursor:not-allowed}
+.sbtn svg{width:15px;height:15px;fill:#fff}
+.hint{font-size:11px;color:var(--t2);text-align:center;margin-top:7px}
+</style>
 </head>
 <body>
 
-<!-- ====================================================================== -->
-<!-- Header                                                                  -->
-<!-- ====================================================================== -->
 <header class="hdr">
-  <div class="hdr-left">
-    <div class="avatar">N</div>
+  <div class="hl">
+    <div class="av">N</div>
     <div>
-      <div class="agent-name">NosaBot</div>
-      <div class="status-row">
-        <div class="dot" id="dot"></div>
-        <span id="status-txt">Connecting…</span>
-      </div>
+      <div class="an">NosaBot</div>
+      <div class="sr"><div class="dot" id="dot"></div><span id="stxt">Connecting…</span></div>
     </div>
   </div>
-  <div class="nosana-badge">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-    </svg>
+  <div class="badge">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
     Powered by Nosana
   </div>
 </header>
 
-<!-- ====================================================================== -->
-<!-- Body layout                                                             -->
-<!-- ====================================================================== -->
 <div class="layout">
-
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="sb-section">
-      <div class="sb-title">Quick Actions</div>
-      <div class="qa" onclick="send('What can you help me with?')"><span class="ic">💡</span> Capabilities</div>
-      <div class="qa" onclick="send('List my tasks')"><span class="ic">✅</span> My tasks</div>
-      <div class="qa" onclick="send('List my notes')"><span class="ic">📝</span> My notes</div>
-      <div class="qa" onclick="send('What is Nosana?')"><span class="ic">🔗</span> About Nosana</div>
-      <div class="qa" onclick="send('Give me a productivity tip')"><span class="ic">🚀</span> Productivity tip</div>
+  <aside class="sb">
+    <div class="sbs">
+      <div class="sbt">Build Agents</div>
+      <div class="qa" onclick="send('Build me a Solana DeFi monitoring agent')"><span class="qi">🤖</span>Build an agent</div>
+      <div class="qa" onclick="send('Generate a Nosana job definition for myuser/my-agent:latest')"><span class="qi">🚀</span>Deploy to Nosana</div>
+      <div class="qa" onclick="send('How do I deploy my agent to Nosana?')"><span class="qi">📖</span>Deploy guide</div>
     </div>
-
-    <div class="sb-section">
-      <div class="sb-title">Session Stats</div>
-      <div class="stats">
-        <div class="stat">
-          <div class="stat-v" id="s-msgs">0</div>
-          <div class="stat-l">Messages</div>
-        </div>
-        <div class="stat">
-          <div class="stat-v" id="s-speed">—</div>
-          <div class="stat-l">Avg Speed</div>
-        </div>
+    <div class="sbs">
+      <div class="sbt">Nosana Network</div>
+      <div class="qa" onclick="send('Show Nosana network stats')"><span class="qi">📊</span>Network stats</div>
+      <div class="qa" onclick="send('What is Nosana?')"><span class="qi">🔗</span>About Nosana</div>
+      <div class="qa" onclick="send('What GPU markets does Nosana have?')"><span class="qi">⚡</span>GPU markets</div>
+    </div>
+    <div class="netw" id="netw">
+      <div class="sbt">Live Network</div>
+      <div class="net-loading" id="net-loading">Fetching stats…</div>
+      <div id="net-stats" style="display:none">
+        <div class="net-row"><span class="net-k">Active Nodes</span><span class="net-v" id="n-nodes">—</span></div>
+        <div class="net-row"><span class="net-k">Jobs Done</span><span class="net-v" id="n-jobs">—</span></div>
+        <div class="net-row"><span class="net-k">Network</span><span class="net-v">Solana</span></div>
       </div>
     </div>
-
+    <div class="sbs">
+      <div class="sbt">Productivity</div>
+      <div class="qa" onclick="send('List my tasks')"><span class="qi">✅</span>My tasks</div>
+      <div class="qa" onclick="send('List my notes')"><span class="qi">📝</span>My notes</div>
+    </div>
+    <div class="sbs">
+      <div class="sbt">Session</div>
+      <div class="stats">
+        <div class="stat"><div class="sv" id="s-msgs">0</div><div class="sl">Messages</div></div>
+        <div class="stat"><div class="sv" id="s-spd">—</div><div class="sl">Avg Speed</div></div>
+      </div>
+    </div>
     <div class="meta">
-      <div class="meta-row">🤖 Model: <b>Qwen 3.5</b></div>
-      <div class="meta-row">⚡ Compute: <span class="green">Nosana GPU</span></div>
-      <div class="meta-row">🔒 Framework: <b>ElizaOS v1</b></div>
+      <div class="mr">🤖 Model: <b>Qwen 3.5</b></div>
+      <div class="mr">⚡ Compute: <span class="g">Nosana GPU</span></div>
+      <div class="mr">🔒 Framework: <b>ElizaOS v1</b></div>
     </div>
   </aside>
 
-  <!-- Chat -->
   <div class="chat">
-    <div class="err-banner" id="err"></div>
-
+    <div class="err" id="err"></div>
     <div class="msgs" id="msgs">
       <div class="welcome" id="welcome">
-        <div class="welcome-icon">🤖</div>
-        <h2>Welcome to NosaBot</h2>
-        <p>Your personal AI assistant running on Nosana's decentralized GPU network.
-           Manage tasks, capture notes, and get instant answers — on infrastructure you control.</p>
+        <div class="wi">🤖</div>
+        <h2>NosaBot — Nosana Agent Builder</h2>
+        <p>Describe any AI agent and I'll generate a complete ElizaOS character file. I'll also help you deploy it to Nosana's decentralized GPU network — the same infrastructure running me right now.</p>
         <div class="chips">
-          <div class="chip" onclick="send('What can you help me with?')">What can you do?</div>
-          <div class="chip" onclick="send('Add task: Set up my Nosana wallet')">Add a task</div>
-          <div class="chip" onclick="send('Note: ElizaOS actions need validate and handler')">Save a note</div>
-          <div class="chip" onclick="send('What is Nosana?')">About Nosana</div>
-          <div class="chip" onclick="send('Tell me about decentralized AI')">Decentralized AI</div>
+          <div class="chip" onclick="send('What can you do?')">What can you do?</div>
+          <div class="chip" onclick="send('Build me a crypto price alert agent')">Build an agent</div>
+          <div class="chip" onclick="send('Generate a Nosana job definition for myuser/my-agent:latest')">Generate job def</div>
+          <div class="chip" onclick="send('Show Nosana network stats')">Network stats</div>
+          <div class="chip" onclick="send('How do I deploy to Nosana?')">Deploy guide</div>
         </div>
       </div>
     </div>
-
-    <div class="input-area">
-      <div class="input-wrap">
-        <textarea id="txt" placeholder="Message NosaBot…" rows="1"
-          onkeydown="onKey(event)" oninput="resize(this)"></textarea>
-        <button class="send-btn" id="send-btn" onclick="sendInput()">
+    <div class="ia">
+      <div class="iw">
+        <textarea id="txt" placeholder="Describe an agent to build, ask about Nosana, or manage tasks…" rows="1" onkeydown="onKey(event)" oninput="resize(this)"></textarea>
+        <button class="sbtn" id="sbtn" onclick="sendInput()">
           <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
         </button>
       </div>
@@ -362,233 +205,218 @@
   </div>
 </div>
 
-<!-- ====================================================================== -->
-<!-- Script                                                                  -->
-<!-- ====================================================================== -->
 <script>
-// State
-let agentId   = null;
-let userId    = 'user-' + Math.random().toString(36).slice(2, 10);
-let roomId    = 'room-' + Math.random().toString(36).slice(2, 10);
-let busy      = false;
-let msgCount  = 0;
-let rtimes    = [];
+let agentId=null,userId='u-'+Math.random().toString(36).slice(2,10),roomId='r-'+Math.random().toString(36).slice(2,10),busy=false,msgCount=0,rtimes=[];
 
-// ---- Init ----------------------------------------------------------------
-async function init() {
-  try {
-    const r = await fetch('/api/agents');
-    if (!r.ok) throw new Error(r.status);
-    const body = await r.json();
-    const list = Array.isArray(body) ? body : (body.agents || body.data || []);
-    if (!list.length) throw new Error('no agents');
-    agentId = list[0].id ?? list[0].agentId ?? list[0]._id;
-    setStatus(true, 'NosaBot · Online');
-  } catch (e) {
-    setStatus(false, 'Reconnecting…');
-    setTimeout(init, 3000);
+async function init(){
+  try{
+    const r=await fetch('/api/agents');
+    if(!r.ok)throw new Error(r.status);
+    const b=await r.json();
+    const list=Array.isArray(b)?b:(b.agents||b.data||[]);
+    if(!list.length)throw new Error('no agents');
+    agentId=list[0].id??list[0].agentId??list[0]._id;
+    setStatus(true,'NosaBot · Online');
+  }catch(e){
+    setStatus(false,'Reconnecting…');
+    setTimeout(init,3000);
   }
 }
 
-function setStatus(online, text) {
-  document.getElementById('dot').className = 'dot' + (online ? ' on' : '');
-  document.getElementById('status-txt').textContent = text;
+async function loadNetStats(){
+  try{
+    const r=await fetch('/api/nodes/summary');
+    if(!r.ok)throw new Error();
+    const d=await r.json();
+    const active=d.active??d.available??'—';
+    const jobs=d.completedJobs??d.jobs??'—';
+    document.getElementById('n-nodes').textContent=active;
+    document.getElementById('n-jobs').textContent=typeof jobs==='number'?jobs.toLocaleString():jobs;
+    document.getElementById('net-loading').style.display='none';
+    document.getElementById('net-stats').style.display='block';
+  }catch{
+    document.getElementById('net-loading').textContent='Visit app.nosana.io';
+  }
 }
 
-// ---- Send ----------------------------------------------------------------
-async function send(text) {
-  text = (text ?? '').trim();
-  if (!text || busy) return;
+function setStatus(on,txt){
+  document.getElementById('dot').className='dot'+(on?' on':'');
+  document.getElementById('stxt').textContent=txt;
+}
 
-  // remove welcome screen
-  const w = document.getElementById('welcome');
-  if (w) w.remove();
-
-  pushMsg('user', text);
-  msgCount++;
-  updateStats();
-
-  const typing = pushTyping();
-  busy = true;
-  lock(true);
-
-  const t0 = Date.now();
-  try {
-    if (!agentId) await init();
-
-    // Try primary endpoint, fall back to alternative
-    let res = await tryPost(`/api/${agentId}/message`, text);
-    if (!res && agentId) res = await tryPost(`/api/agents/${agentId}/message`, text);
-    if (!res) throw new Error('No response from agent');
-
+async function send(text){
+  text=(text??'').trim();
+  if(!text||busy)return;
+  const w=document.getElementById('welcome');
+  if(w)w.remove();
+  appendMsg('user',text);
+  msgCount++;updateStats();
+  const typing=showTyping();
+  busy=true;lock(true);
+  const t0=Date.now();
+  try{
+    if(!agentId)await init();
+    let data=await tryPost(`/api/${agentId}/message`,text);
+    if(!data)data=await tryPost(`/api/agents/${agentId}/message`,text);
+    if(!data)throw new Error('No response');
     typing.remove();
-    const msgs = Array.isArray(res) ? res : [res];
-    msgs.forEach(m => {
-      const t = m.text ?? m.content?.text ?? m.message ?? '';
-      if (t) pushMsg('agent', t);
-    });
-
-    rtimes.push(Date.now() - t0);
-    if (rtimes.length > 12) rtimes.shift();
-    updateStats();
-    hideErr();
-
-  } catch (e) {
+    const msgs=Array.isArray(data)?data:[data];
+    msgs.forEach(m=>{const t=m.text??m.content?.text??m.message??'';if(t)appendMsg('agent',t);});
+    rtimes.push(Date.now()-t0);if(rtimes.length>12)rtimes.shift();
+    updateStats();hideErr();
+  }catch(e){
     typing.remove();
-    pushMsg('agent', '⚠️ I had trouble reaching the server. Please wait a moment and try again.');
+    appendMsg('agent','⚠️ Trouble reaching the server. Please try again.');
     showErr(e.message);
-  } finally {
-    busy = false;
-    lock(false);
+  }finally{
+    busy=false;lock(false);
     document.getElementById('txt').focus();
   }
 }
 
-async function tryPost(url, text) {
-  try {
-    const r = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, userId, userName: 'User', roomId, source: 'direct' })
-    });
-    if (!r.ok) return null;
+async function tryPost(url,text){
+  try{
+    const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({text,userId,userName:'User',roomId,source:'direct'})});
+    if(!r.ok)return null;
     return await r.json();
-  } catch {
-    return null;
+  }catch{return null;}
+}
+
+function sendInput(){
+  const el=document.getElementById('txt');
+  const t=el.value.trim();
+  if(t){el.value='';el.style.height='auto';send(t);}
+}
+function onKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendInput();}}
+function resize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,110)+'px';}
+function lock(on){document.getElementById('txt').disabled=on;document.getElementById('sbtn').disabled=on;}
+function showErr(m){const el=document.getElementById('err');el.textContent='⚠️ '+m;el.classList.add('show');}
+function hideErr(){document.getElementById('err').classList.remove('show');}
+function updateStats(){
+  document.getElementById('s-msgs').textContent=msgCount;
+  if(rtimes.length){
+    const avg=rtimes.reduce((a,b)=>a+b,0)/rtimes.length;
+    document.getElementById('s-spd').textContent=avg<1000?Math.round(avg)+'ms':(avg/1000).toFixed(1)+'s';
   }
 }
 
-function sendInput() {
-  const el = document.getElementById('txt');
-  const t  = el.value.trim();
-  if (t) { el.value = ''; el.style.height = 'auto'; send(t); }
-}
-
-function onKey(e) {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendInput(); }
-}
-
-function resize(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 110) + 'px';
-}
-
-function lock(on) {
-  document.getElementById('txt').disabled      = on;
-  document.getElementById('send-btn').disabled = on;
-}
-
-// ---- DOM helpers ---------------------------------------------------------
-function pushMsg(role, text) {
-  const box = document.getElementById('msgs');
-
-  const wrap = document.createElement('div');
-  wrap.className = `msg ${role}`;
-
-  const av  = document.createElement('div');
-  av.className = 'msg-av';
-  av.textContent = role === 'agent' ? 'N' : '👤';
-
-  const body = document.createElement('div');
-  body.className = 'msg-body';
-  body.innerHTML = md(text);
-
-  wrap.appendChild(av);
-  wrap.appendChild(body);
+function appendMsg(role,text){
+  const box=document.getElementById('msgs');
+  const wrap=document.createElement('div');wrap.className='msg '+role;
+  const av=document.createElement('div');av.className='mav';av.textContent=role==='agent'?'N':'👤';
+  const body=document.createElement('div');body.className='mb';
+  body.innerHTML=renderMd(text);
+  // wire up copy/download buttons after insertion
+  wrap.appendChild(av);wrap.appendChild(body);
   box.appendChild(wrap);
-  box.scrollTop = box.scrollHeight;
+  // attach cb button handlers
+  body.querySelectorAll('.cb-btn[data-action="copy"]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const code=btn.closest('.cb-wrap').querySelector('pre').textContent;
+      navigator.clipboard.writeText(code).then(()=>{
+        btn.textContent='Copied!';btn.classList.add('copied');
+        setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},2000);
+      });
+    });
+  });
+  body.querySelectorAll('.cb-btn[data-action="download"]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const wrap2=btn.closest('.cb-wrap');
+      const code=wrap2.querySelector('pre').textContent;
+      const lang=wrap2.querySelector('.cb-lang').textContent.toLowerCase();
+      const ext=lang==='json'?'json':lang==='bash'?'sh':'txt';
+      const name=lang==='json'?'agent.character.json':lang==='bash'?'deploy.sh':'output.txt';
+      const a=document.createElement('a');
+      a.href='data:text/plain;charset=utf-8,'+encodeURIComponent(code);
+      a.download=name;a.click();
+    });
+  });
+  box.scrollTop=box.scrollHeight;
   return wrap;
 }
 
-function pushTyping() {
-  const box  = document.getElementById('msgs');
-  const wrap = document.createElement('div');
-  wrap.className = 'msg agent';
-  wrap.id = 'typing';
-
-  const av = document.createElement('div');
-  av.className = 'msg-av';
-  av.textContent = 'N';
-
-  const body = document.createElement('div');
-  body.className = 'msg-body';
-  body.innerHTML = '<div class="typing-wrap"><div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div></div>';
-
-  wrap.appendChild(av);
-  wrap.appendChild(body);
-  box.appendChild(wrap);
-  box.scrollTop = box.scrollHeight;
+function showTyping(){
+  const box=document.getElementById('msgs');
+  const wrap=document.createElement('div');wrap.className='msg agent';wrap.id='typing';
+  const av=document.createElement('div');av.className='mav';av.textContent='N';
+  const body=document.createElement('div');body.className='mb';
+  body.innerHTML='<div class="tw"><div class="td"></div><div class="td"></div><div class="td"></div></div>';
+  wrap.appendChild(av);wrap.appendChild(body);box.appendChild(wrap);
+  box.scrollTop=box.scrollHeight;
   return wrap;
 }
 
-function showErr(msg) {
-  const el = document.getElementById('err');
-  el.textContent = `⚠️ ${msg}`;
-  el.classList.add('show');
-}
-function hideErr() { document.getElementById('err').classList.remove('show'); }
+// ── Markdown renderer ──────────────────────────────────────────────────────
+function renderMd(raw){
+  // escape html
+  let s=raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
-function updateStats() {
-  document.getElementById('s-msgs').textContent = msgCount;
-  if (rtimes.length) {
-    const avg = rtimes.reduce((a,b) => a+b, 0) / rtimes.length;
-    document.getElementById('s-speed').textContent =
-      avg < 1000 ? `${Math.round(avg)}ms` : `${(avg/1000).toFixed(1)}s`;
-  }
-}
-
-// ---- Minimal markdown renderer -------------------------------------------
-function md(raw) {
-  // Escape HTML first
-  let s = raw
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-
-  // Code blocks (``` ```)
-  s = s.replace(/```[\w]*\n?([\s\S]*?)```/g, (_, c) => `<pre><code>${c.trim()}</code></pre>`);
-
-  // Inline code
-  s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
-
-  // Bold / italic / strikethrough
-  s = s.replace(/\*\*\*([^*]+)\*\*\*/g, '<strong><em>$1</em></strong>');
-  s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-  s = s.replace(/\*([^*]+)\*/g,     '<em>$1</em>');
-  s = s.replace(/~~([^~]+)~~/g,     '<del>$1</del>');
-
-  // Tables (basic)
-  s = s.replace(/((?:\|.+\|\n)+)/g, (table) => {
-    const rows = table.trim().split('\n').filter(r => !/^\|[-| :]+\|$/.test(r.trim()));
-    const html = rows.map((r, i) => {
-      const cells = r.split('|').filter((_, ci) => ci > 0 && ci < r.split('|').length - 1);
-      const tag = i === 0 ? 'th' : 'td';
-      return '<tr>' + cells.map(c => `<${tag}>${c.trim()}</${tag}>`).join('') + '</tr>';
-    }).join('');
-    return `<table>${html}</table>`;
+  // fenced code blocks
+  s=s.replace(/```(\w*)\n?([\s\S]*?)```/g,(_,lang,code)=>{
+    const label=lang||'code';
+    const highlighted=syntaxHL(code.trim(),lang);
+    return `<div class="cb-wrap">
+<div class="cb-head"><span class="cb-lang">${label}</span>
+<div class="cb-actions">
+<button class="cb-btn" data-action="copy">Copy</button>
+<button class="cb-btn" data-action="download">Download</button>
+</div></div>
+<pre>${highlighted}</pre></div>`;
   });
 
-  // Unordered lists
-  s = s.replace(/((?:^[ \t]*(?:•|-|\*) .+\n?)+)/gm, (block) => {
-    const items = block.trim().split('\n').map(l => `<li>${l.replace(/^[ \t]*(?:•|-|\*) /, '')}</li>`).join('');
+  // inline code
+  s=s.replace(/`([^`]+)`/g,'<code style="background:rgba(0,0,0,.35);padding:2px 5px;border-radius:4px;font-family:monospace;font-size:12px">$1</code>');
+
+  // bold/italic/strike
+  s=s.replace(/\*\*\*([^*]+)\*\*\*/g,'<strong><em>$1</em></strong>');
+  s=s.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+  s=s.replace(/\*([^*\n]+)\*/g,'<em>$1</em>');
+  s=s.replace(/~~([^~]+)~~/g,'<del>$1</del>');
+
+  // tables
+  s=s.replace(/((?:\|.+\|\n)+)/g,tbl=>{
+    const rows=tbl.trim().split('\n').filter(r=>!/^\|[-| :]+\|$/.test(r.trim()));
+    return '<table>'+rows.map((r,i)=>{
+      const cells=r.split('|').filter((_,ci)=>ci>0&&ci<r.split('|').length-1);
+      const tag=i===0?'th':'td';
+      return '<tr>'+cells.map(c=>`<${tag}>${c.trim()}</${tag}>`).join('')+'</tr>';
+    }).join('')+'</table>';
+  });
+
+  // lists
+  s=s.replace(/((?:^[ \t]*(?:•|-|\*) .+\n?)+)/gm,block=>{
+    const items=block.trim().split('\n').map(l=>`<li>${l.replace(/^[ \t]*(?:•|-|\*) /,'')}</li>`).join('');
     return `<ul>${items}</ul>`;
   });
-
-  // Ordered lists
-  s = s.replace(/((?:^\d+\. .+\n?)+)/gm, (block) => {
-    const items = block.trim().split('\n').map(l => `<li>${l.replace(/^\d+\. /, '')}</li>`).join('');
+  s=s.replace(/((?:^\d+\. .+\n?)+)/gm,block=>{
+    const items=block.trim().split('\n').map(l=>`<li>${l.replace(/^\d+\. /,'')}</li>`).join('');
     return `<ol>${items}</ol>`;
   });
 
-  // Line breaks → paragraphs
-  const paras = s.split(/\n{2,}/);
-  s = paras.map(p => p.trim() ? `<p>${p.replace(/\n/g, '<br>')}</p>` : '').join('');
+  // links
+  s=s.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,'<a href="$2" target="_blank" style="color:var(--acl)">$1</a>');
 
+  // paragraphs
+  const paras=s.split(/\n{2,}/);
+  s=paras.map(p=>p.trim()?`<p>${p.replace(/\n/g,'<br>')}</p>`:'').join('');
   return s;
 }
 
-// ---- Boot ----------------------------------------------------------------
+function syntaxHL(code,lang){
+  if(lang==='json'){
+    return code
+      .replace(/("(?:[^"\\]|\\.)*")(\s*:)/g,'<span class="key">$1</span>$2')
+      .replace(/:(\s*)("(?:[^"\\]|\\.)*")/g,':<span class="str">$1$2</span>')
+      .replace(/:\s*(true|false|null)\b/g,': <span class="bool">$1</span>')
+      .replace(/:\s*(-?\d+\.?\d*)/g,': <span class="num">$1</span>');
+  }
+  return code;
+}
+
+// boot
 init();
+loadNetStats();
 </script>
 </body>
 </html>
