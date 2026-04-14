@@ -30,10 +30,9 @@ RUN npm install -g pnpm
 COPY package.json ./
 RUN pnpm install
 
-# Copy source and build TypeScript plugin
+# Copy all source files
 COPY tsconfig.json ./
 COPY src/ ./src/
-RUN pnpm build
 
 # Copy remaining project files
 COPY characters/ ./characters/

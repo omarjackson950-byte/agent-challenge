@@ -3,8 +3,7 @@
   "username": "nosabot",
   "plugins": [
     "@elizaos/plugin-bootstrap",
-    "@elizaos/plugin-openai",
-    "./dist/index.js"
+    "@elizaos/plugin-openai"
   ],
   "clients": [],
   "modelProvider": "openai",
