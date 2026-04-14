@@ -1,9 +1,13 @@
 {
+  "version": "0.1",
+  "type": "container",
+  "meta": { "trigger": "cli" },
   "ops": [
     {
-      "id": "nosabot-agent",
+      "type": "container/run",
+      "id": "nosabot",
       "args": {
-        "image": "yourusername/nosabot-eliza-agent:latest",
+        "image": "omarj18/nosabot:latest",
         "expose": 3000,
         "env": {
           "OPENAI_API_KEY":              "nosana",
@@ -15,14 +19,10 @@
           "MODEL_NAME":                  "Qwen/Qwen3.5-4B",
           "SERVER_PORT":                 "3001",
           "NODE_ENV":                    "production",
-          "ELIZAOS_TELEMETRY_DISABLED":  "true"
+          "ELIZAOS_TELEMETRY_DISABLED":  "true",
+          "DO_NOT_TRACK":                "1"
         }
-      },
-      "execution": {
-        "group": "run"
-      },
-      "type": "container/run"
+      }
     }
-  ],
-  "version": "0.1"
+  ]
 }
