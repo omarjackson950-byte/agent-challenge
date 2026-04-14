@@ -210,7 +210,7 @@ let agentId=null,userId='u-'+Math.random().toString(36).slice(2,10),roomId='r-'+
 
 async function init(){
   try{
-    const r=await fetch('/api/agents');
+    const r=await fetch('/agents');
     if(!r.ok)throw new Error(r.status);
     const b=await r.json();
     const list=Array.isArray(b)?b:(b.agents||b.data||[]);
@@ -225,7 +225,7 @@ async function init(){
 
 async function loadNetStats(){
   try{
-    const r=await fetch('/api/nodes/summary');
+    const r=await fetch('https://dashboard.k8s.prd.nos.ci/api/nodes/summary');
     if(!r.ok)throw new Error();
     const d=await r.json();
     const active=d.active??d.available??'—';
@@ -256,8 +256,8 @@ async function send(text){
   const t0=Date.now();
   try{
     if(!agentId)await init();
-    let data=await tryPost(`/api/${agentId}/message`,text);
-    if(!data)data=await tryPost(`/api/agents/${agentId}/message`,text);
+    let data=await tryPost(`/${agentId}/message`,text);
+    if(!data)data=await tryPost(`/agents/${agentId}/message`,text);
     if(!data)throw new Error('No response');
     typing.remove();
     const msgs=Array.isArray(data)?data:[data];
